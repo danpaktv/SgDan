@@ -14,6 +14,7 @@ int ResultofMatch;
 unsigned int RNG0;
 int SGLobbyName;
 int SGLobbySize;
+int SGLobbyType;
 int Player1or2;
 __int64 OwnSteamID;
 __int64 OpponentSteamID;
@@ -111,6 +112,7 @@ void ReadMemory()
 			ReadProcessMemory(processHandle, (LPVOID)(BaseAdressLobby + 0x14), &BaseAdressLobby, sizeof(BaseAdressLobby), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(BaseAdressLobby + 0x7EC), &SGLobbyName, sizeof(SGLobbyName), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(BaseAdressLobby + 0x7FC), &SGLobbySize, sizeof(SGLobbySize), 0);
+			ReadProcessMemory(processHandle, (LPVOID)(BaseAdressLobby + 0x804), &SGLobbyType, sizeof(SGLobbyType), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(gameBaseAddress + 0x000339E8), &Player1or2, sizeof(Player1or2), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(Player1or2), &Player1or2, sizeof(Player1or2), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(gameBaseAddress + 0x008530B8), &OwnSteamID, sizeof(OwnSteamID), 0);
@@ -118,7 +120,7 @@ void ReadMemory()
 			ReadProcessMemory(processHandle, (LPVOID)(OwnSteamID + 0x18), &OwnSteamID, sizeof(OwnSteamID), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(gameBaseAddress + 0x001D93E8), &OpponentSteamID, sizeof(OpponentSteamID), 0);
 			ReadProcessMemory(processHandle, (LPVOID)(OpponentSteamID), &OpponentSteamID, sizeof(OpponentSteamID), 0);
-			SGDANState = GameStatus + RNG0 + SGLobbyName + SGLobbySize;
+			SGDANState = GameStatus + RNG0 + SGLobbyName + SGLobbySize + SGLobbyType;
 		}
 	}
 }
@@ -195,6 +197,22 @@ void TextOutput() {
 					cout << "(You're using the wrong lobby size! Select 2, play One-to-one!)" << endl;
 					NOTsendreason = 2;
 				}
+			cout << "SGLobbyType: " << SGLobbyType << " ";
+			switch (SGLobbyType) {
+				case 1:
+					cout << "(All Play)" << endl;
+					break;
+				case 2:
+					cout << "(Queen of the Hill)" << endl;
+					NOTsendreason = 6;
+					break;
+				case 3:
+					cout << "(Training)" << endl;
+					NOTsendreason = 6;
+					break;
+				default:
+					cout << "(We are not in Lobby?)" << endl;
+			}
 			cout << "Player1or2: " << Player1or2 << " ";
 				if (Player1or2 == 1) {
 					cout << "(We are Player1!)" << endl;
@@ -205,7 +223,7 @@ void TextOutput() {
 
 
 			cout << endl << "Comment: ";
-				if ((OpponentSteamID != 0) and (SGLobbyName == 36) and (SGLobbySize == 2) and (GameStatus == 6)) {
+				if ((OpponentSteamID != 0) and (SGLobbyName == 36) and (SGLobbySize == 2) and (GameStatus == 6) and (SGLobbyType == 1)) {
 					std::cout << "We are ready to send data! (Someday, Someday...)";
 					}
 				else {
@@ -225,6 +243,9 @@ void TextOutput() {
 						break;
 						case 5:
 							std::cout << "You're still playing alone! :O";
+						break;
+						case 6:
+							std::cout << "You're playing wrong lobby type! :O";
 						break;
 						}
 				}
